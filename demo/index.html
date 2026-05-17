@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZeroDay Detector — AI-Powered Zero-Day Attack Detection</title>
+<meta name="description" content="Deep Autoencoder trained on real network traffic for zero-day attack detection. No attack samples needed.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0A2342;--card:#112240;--accent:#028090;--mint:#02C39A;--text:#E2E8F0;--text-dim:#8892B0;--danger:#FF6B6B;--danger-dark:#E63946;--success:#02C39A;--radius:12px;--shadow:0 10px 40px rgba(0,0,0,.3)}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+
+/* NAVBAR */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,35,66,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(2,128,144,.15);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between}
+.navbar .logo{font-size:1.3rem;font-weight:800;color:var(--accent);letter-spacing:-.5px}
+.navbar .logo span{color:var(--mint)}
+.nav-btn{background:var(--accent);color:#fff;border:none;padding:.55rem 1.4rem;border-radius:50px;font-family:inherit;font-weight:600;font-size:.85rem;cursor:pointer;transition:all .3s}
+.nav-btn:hover{background:var(--mint);transform:translateY(-1px);box-shadow:0 4px 20px rgba(2,195,154,.3)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 1.5rem 4rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(2,128,144,.12) 0%,transparent 70%);top:-100px;right:-200px;border-radius:50%;animation:pulse 6s ease-in-out infinite}
+.hero::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(2,195,154,.08) 0%,transparent 70%);bottom:-50px;left:-100px;border-radius:50%;animation:pulse 8s ease-in-out infinite reverse}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.15);opacity:1}}
+.hero h1{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900;letter-spacing:-1.5px;margin-bottom:1rem;background:linear-gradient(135deg,#fff 0%,var(--mint) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;position:relative}
+.hero .subtitle{font-size:clamp(.95rem,2vw,1.2rem);color:var(--text-dim);max-width:600px;margin-bottom:2.5rem;position:relative}
+.stat-pills{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;position:relative}
+.stat-pill{background:var(--card);border:1px solid rgba(2,128,144,.25);padding:.7rem 1.5rem;border-radius:50px;font-size:.85rem;font-weight:500;color:var(--text);box-shadow:0 0 20px rgba(2,128,144,.1);transition:all .3s;animation:glow 3s ease-in-out infinite alternate}
+.stat-pill:nth-child(2){animation-delay:1.5s}
+@keyframes glow{0%{box-shadow:0 0 10px rgba(2,128,144,.1)}100%{box-shadow:0 0 25px rgba(2,195,154,.2)}}
+.stat-pill strong{color:var(--mint)}
+
+/* SECTIONS */
+section{padding:5rem 1.5rem}
+.section-title{text-align:center;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;margin-bottom:.5rem;letter-spacing:-.5px}
+.section-sub{text-align:center;color:var(--text-dim);margin-bottom:3rem;font-size:.95rem}
+
+/* METRICS */
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;max-width:960px;margin:0 auto}
+.metric-card{background:var(--card);border:1px solid rgba(2,128,144,.12);border-radius:var(--radius);padding:2rem;text-align:center;transition:all .4s;position:relative;overflow:hidden}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--mint));transform:scaleX(0);transition:transform .4s}
+.metric-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:rgba(2,128,144,.3)}
+.metric-card:hover::before{transform:scaleX(1)}
+.metric-label{font-size:.8rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.5rem}
+.metric-value{font-size:2.8rem;font-weight:900;color:var(--mint);margin-bottom:.3rem}
+.metric-dataset{font-size:.78rem;color:var(--text-dim)}
+.metric-value.animate{animation:countUp .8s ease-out}
+@keyframes countUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* TABLE */
+.table-wrap{max-width:900px;margin:0 auto;overflow-x:auto;border-radius:var(--radius);border:1px solid rgba(2,128,144,.12)}
+table{width:100%;border-collapse:collapse;background:var(--card)}
+th{background:rgba(2,128,144,.12);padding:.9rem 1.2rem;text-align:left;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent)}
+td{padding:.8rem 1.2rem;border-top:1px solid rgba(255,255,255,.04);font-size:.9rem}
+tr.highlight{background:rgba(2,195,154,.08)}
+tr.highlight td{color:var(--mint);font-weight:600}
+tr:hover:not(.highlight){background:rgba(255,255,255,.02)}
+
+/* TEST SECTION */
+#test-section{max-width:760px;margin:0 auto;padding:5rem 1.5rem}
+.preset-btns{display:flex;gap:.7rem;flex-wrap:wrap;margin-bottom:1.2rem}
+.preset-btn{background:var(--card);border:1px solid rgba(2,128,144,.2);color:var(--text);padding:.55rem 1.2rem;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:500;transition:all .3s}
+.preset-btn:hover{border-color:var(--mint);color:var(--mint);transform:translateY(-1px)}
+.preset-btn.active{border-color:var(--mint);background:rgba(2,195,154,.1);color:var(--mint)}
+textarea{width:100%;min-height:120px;background:rgba(10,35,66,.6);border:1px solid rgba(2,128,144,.2);border-radius:var(--radius);padding:1rem;color:var(--text);font-family:'Inter',monospace;font-size:.88rem;resize:vertical;transition:border-color .3s;line-height:1.5}
+textarea:focus{outline:none;border-color:var(--mint);box-shadow:0 0 0 3px rgba(2,195,154,.1)}
+textarea::placeholder{color:var(--text-dim)}
+.feature-names{font-size:.72rem;color:var(--text-dim);margin-top:.6rem;line-height:1.6;word-break:break-word}
+.analyze-btn{width:100%;margin-top:1.5rem;padding:1rem;background:linear-gradient(135deg,var(--accent),var(--mint));color:#fff;border:none;border-radius:var(--radius);font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.analyze-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(2,195,154,.3)}
+.analyze-btn:active{transform:translateY(0)}
+.analyze-btn:disabled{opacity:.7;cursor:not-allowed;transform:none}
+.spinner{display:none;width:20px;height:20px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RESULT */
+.result-card{margin-top:2rem;border-radius:var(--radius);padding:2rem;display:none;animation:slideUp .5s ease-out}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.result-card.malicious{background:linear-gradient(135deg,rgba(230,57,70,.15),rgba(255,107,107,.08));border:1px solid rgba(230,57,70,.3)}
+.result-card.safe{background:linear-gradient(135deg,rgba(2,195,154,.12),rgba(2,128,144,.08));border:1px solid rgba(2,195,154,.3)}
+.result-icon{font-size:2.5rem;margin-bottom:.5rem}
+.result-label{font-size:2rem;font-weight:900;letter-spacing:1px;margin-bottom:1rem}
+.result-card.malicious .result-label{color:var(--danger)}
+.result-card.safe .result-label{color:var(--success)}
+.confidence-row{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+.confidence-pct{font-size:1.4rem;font-weight:700;min-width:70px}
+.progress-bar{flex:1;height:10px;background:rgba(255,255,255,.08);border-radius:50px;overflow:hidden}
+.progress-fill{height:100%;border-radius:50px;transition:width 1s ease-out}
+.result-card.malicious .progress-fill{background:linear-gradient(90deg,var(--danger-dark),var(--danger))}
+.result-card.safe .progress-fill{background:linear-gradient(90deg,var(--accent),var(--mint))}
+.result-meta{font-size:.82rem;color:var(--text-dim);margin-top:.3rem}
+
+/* FOOTER */
+footer{text-align:center;padding:3rem 1.5rem;color:var(--text-dim);font-size:.8rem;border-top:1px solid rgba(2,128,144,.1)}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .navbar{padding:0 1rem}
+  .stat-pills{flex-direction:column;align-items:center}
+  .metrics-grid{grid-template-columns:1fr}
+  .preset-btns{flex-direction:column}
+}
+
+/* INTERSECTION OBSERVER ANIMATION */
+.reveal{opacity:0;transform:translateY(30px);transition:all .7s ease-out}
+.reveal.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="logo">ZeroDay<span>Detector</span></div>
+  <button class="nav-btn" onclick="document.getElementById('test-section').scrollIntoView({behavior:'smooth'})">Test It Yourself</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Zero-Day Attack Detection</h1>
+  <p class="subtitle">Deep Autoencoder trained on real network traffic — no attack samples needed</p>
+  <div class="stat-pills">
+    <div class="stat-pill">UNSW-NB15 v2 &middot; ROC-AUC <strong>0.9874</strong></div>
+    <div class="stat-pill">CSE-CIC-IDS2018 &middot; ROC-AUC <strong>0.8757</strong></div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section class="reveal">
+  <h2 class="section-title">Model Performance</h2>
+  <p class="section-sub">Evaluated on two major intrusion detection benchmarks</p>
+  <div class="metrics-grid">
+    <div class="metric-card"><div class="metric-label">ROC-AUC</div><div class="metric-value" data-target="0.9874">0</div><div class="metric-dataset">UNSW-NB15 v2</div></div>
+    <div class="metric-card"><div class="metric-label">PR-AUC</div><div class="metric-value" data-target="0.7490">0</div><div class="metric-dataset">UNSW-NB15 v2</div></div>
+    <div class="metric-card"><div class="metric-label">ROC-AUC</div><div class="metric-value" data-target="0.8757">0</div><div class="metric-dataset">CSE-CIC-IDS2018</div></div>
+    <div class="metric-card"><div class="metric-label">PR-AUC</div><div class="metric-value" data-target="0.9542">0</div><div class="metric-dataset">CSE-CIC-IDS2018</div></div>
+  </div>
+</section>
+
+<!-- BASELINE TABLE -->
+<section class="reveal">
+  <h2 class="section-title">vs. Traditional Methods</h2>
+  <p class="section-sub">Our autoencoder outperforms classic anomaly detectors</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Model</th><th>Dataset</th><th>ROC-AUC</th><th>PR-AUC</th></tr></thead>
+      <tbody>
+        <tr class="highlight"><td>Vanilla AE ★</td><td>UNSW-NB15 v2</td><td>0.9874</td><td>0.7490</td></tr>
+        <tr><td>DAE</td><td>UNSW-NB15 v2</td><td>0.9714</td><td>0.6155</td></tr>
+        <tr><td>Isolation Forest</td><td>UNSW-NB15 v2</td><td>0.8510</td><td>0.1118</td></tr>
+        <tr><td>One-Class SVM</td><td>UNSW-NB15 v2</td><td>0.7380</td><td>0.2020</td></tr>
+        <tr class="highlight"><td>DAE ★</td><td>CSE-CIC-IDS2018</td><td>0.8757</td><td>0.9542</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- TEST SECTION -->
+<section id="test-section" class="reveal">
+  <h2 class="section-title">Test It Yourself</h2>
+  <p class="section-sub">Drop a network packet record below — comma or tab separated values</p>
+
+  <div class="preset-btns">
+    <button class="preset-btn" id="btn-normal" onclick="loadPreset('normal')">🟢 Normal Traffic</button>
+    <button class="preset-btn" id="btn-exploit" onclick="loadPreset('exploit')">🔴 Exploit Attack</button>
+    <button class="preset-btn" id="btn-recon" onclick="loadPreset('recon')">🟠 Reconnaissance</button>
+  </div>
+
+  <textarea id="packet-input" placeholder="Paste 31 comma-separated values or click an example above..."></textarea>
+  <div class="feature-names">Features: L4_SRC_PORT, L4_DST_PORT, PROTOCOL, L7_PROTO, IN_BYTES, IN_PKTS, OUT_BYTES, TCP_FLAGS, FLOW_DURATION_MILLISECONDS, DURATION_IN, DURATION_OUT, MIN_TTL, LONGEST_FLOW_PKT, SHORTEST_FLOW_PKT, MIN_IP_PKT_LEN, SRC_TO_DST_SECOND_BYTES, DST_TO_SRC_SECOND_BYTES, RETRANSMITTED_IN_PKTS, SRC_TO_DST_AVG_THROUGHPUT, DST_TO_SRC_AVG_THROUGHPUT, NUM_PKTS_UP_TO_128_BYTES, NUM_PKTS_128_TO_256_BYTES, NUM_PKTS_256_TO_512_BYTES, NUM_PKTS_512_TO_1024_BYTES, TCP_WIN_MAX_IN, TCP_WIN_MAX_OUT, ICMP_TYPE, DNS_QUERY_ID, DNS_QUERY_TYPE, DNS_TTL_ANSWER, FTP_COMMAND_RET_CODE</div>
+
+  <button class="analyze-btn" id="analyze-btn" onclick="analyzePacket()">
+    <span id="btn-text">Analyze Packet</span>
+    <div class="spinner" id="spinner"></div>
+  </button>
+
+  <div class="result-card" id="result-card">
+    <div class="result-icon" id="result-icon"></div>
+    <div class="result-label" id="result-label"></div>
+    <div class="confidence-row">
+      <div class="confidence-pct" id="confidence-pct"></div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+    <div class="result-meta" id="result-error"></div>
+    <div class="result-meta">Threshold: 0.000029</div>
+  </div>
+</section>
+
+<footer>
+  <p>ZeroDay Detector &mdash; Deep Autoencoder Anomaly Detection Demo</p>
+</footer>
+
+<script>
+const PRESETS = {
+  normal: "1305.0,21.0,6.0,1.0,9.0,1.0,193.0,24.0,0.0,0.0,0.0,31.0,89.0,52.0,52.0,456.0,435.0,0.0,3648000.0,3480000.0,15.0,0.0,0.0,0.0,0.0,7240.0,0.0,0.0,0.0,0.0,331.0",
+  exploit: "45545.0,80.0,6.0,7.0,1114.0,10.0,336.0,19.0,4294952.0,15.0,15.0,254.0,381.0,40.0,40.0,1114.0,336.0,1.0,552000.0,168000.0,16.0,0.0,2.0,0.0,16383.0,16383.0,32000.0,0.0,0.0,0.0,0.0",
+  recon: "0.0,0.0,89.0,0.0,7992.0,74.0,0.0,0.0,4294561.0,406.0,0.0,254.0,108.0,108.0,0.0,56162376.0,0.0,0.0,160000.0,0.0,74.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0"
+};
+
+function loadPreset(key) {
+  document.getElementById('packet-input').value = PRESETS[key];
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + key).classList.add('active');
+  document.getElementById('result-card').style.display = 'none';
+}
+
+async function analyzePacket() {
+  const textarea = document.getElementById('packet-input');
+  const resultCard = document.getElementById('result-card');
+  
+  // 1. Clear old result completely
+  resultCard.innerHTML = '';
+  resultCard.style.display = 'none';
+  
+  const packet = textarea.value.trim();
+  if (!packet) {
+    resultCard.innerHTML = '<p style="color:#ff6b6b">Please paste a packet first</p>';
+    resultCard.style.display = 'block';
+    return;
+  }
+  
+  try {
+    const res = await fetch('http://localhost:8000/predict', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ packet })
+    });
+    const data = await res.json();
+    console.log('API response:', data);   // DEBUG — must match what we render
+    
+    // 2. Build NEW card from scratch using ONLY the fresh response
+    const isMalicious = data.label === 'Malicious';
+    const color = isMalicious ? '#ff5555' : '#02C39A';
+    const icon = isMalicious ? '⚠️' : '✅';
+    const pct = Math.round(data.confidence * 100);
+    
+    resultCard.innerHTML = `
+      <div style="font-size:48px">${icon}</div>
+      <h2 style="color:${color}">${data.label.toUpperCase()}</h2>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:32px;font-weight:bold">${pct}%</span>
+        <div style="flex:1;height:10px;background:#1a2a3a;border-radius:5px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:${color}"></div>
+        </div>
+      </div>
+      <p>Reconstruction Error: ${data.reconstruction_error}</p>
+      <p>Threshold: 0.000029</p>
+    `;
+    resultCard.style.display = 'block';
+  } catch (err) {
+    resultCard.innerHTML = `<p style="color:#ff6b6b">Error: ${err.message}</p>`;
+    resultCard.style.display = 'block';
+  }
+}
+
+/* Animated number count-up */
+function animateValues() {
+  document.querySelectorAll('.metric-value[data-target]').forEach(el => {
+    const target = parseFloat(el.dataset.target);
+    const duration = 1200;
+    const start = performance.now();
+    function update(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      el.textContent = (target * ease).toFixed(4);
+      if (t < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  });
+}
+
+/* Intersection Observer for reveal + metric animation */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      if (entry.target.querySelector('.metric-value')) animateValues();
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
