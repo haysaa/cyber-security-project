@@ -1,4 +1,4 @@
-# cyber-security-project
+
 # Zero-Day Attack Detection via Deep Anomaly Analysis
 
 **An Autoencoder-Based Intrusion Detection System for Unknown Network Threats**
